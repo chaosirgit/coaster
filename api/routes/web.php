@@ -11,3 +11,4 @@
 */
 
 $app->post('api/account/register','UserController@register');
+$app->post('/token','TokenController@get_token');
