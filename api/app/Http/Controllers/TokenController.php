@@ -55,7 +55,10 @@ class TokenController extends Controller
 				   '.expires'=>gmdate(DATE_RFC822,$expire_time)],200);
 
 	}
-      }
+	//如果密码不一致
+      }else{
+	return response('',401)->header('Content-Type','text/html;charset=utf-8');
+    }
     }
 }
 ?>
