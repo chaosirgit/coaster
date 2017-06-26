@@ -33,7 +33,13 @@ class TokenController extends Controller
 	$ishave = DB::select('select * from token where uid=:uid',['uid'=>$arr[0]->id]);    
 	//如果获取过
 	if($ishave){
-	  return response('',401)->header('Content-Type','text/html;charset=utf-8');
+	 // return response('',401)->header('Content-Type','text/html;charset=utf-8');
+	  return response()->json(['access_token'=>$ishave[0]->user_token,
+				   'token_type'=>'bearer',
+				   'expires_in'=>'1209599',
+				   'uid'=>$ishave[0]->uid],200);
+				  //'.issued'=>gmdate(DATE_RFC822,$issued_time),
+				  // '.expires'=>gmdate(DATE_RFC822,$expire_time)],200);
 	}
 	//否则
 	else{

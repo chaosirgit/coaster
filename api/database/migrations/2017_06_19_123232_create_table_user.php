@@ -25,6 +25,7 @@ class CreateTableUser extends Migration
 	    $table->integer('weight')->nullable();
 	    $table->string('email')->nullable();
         });
+    	
     }
 
     /**

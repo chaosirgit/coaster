@@ -12,3 +12,5 @@
 
 $app->post('api/account/register','UserController@register');
 $app->post('/token','TokenController@get_token');
+$app->put('api/account/profile','ProfileController@update');
+$app->get('api/account/profile','ProfileController@getinfo');
