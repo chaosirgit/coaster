@@ -8,7 +8,7 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Contracts\Auth\Authenticatable as AuthenticatableContract;
 use Illuminate\Contracts\Auth\Access\Authorizable as AuthorizableContract;
 
-class Token extends Model implements AuthenticatableContract, AuthorizableContract
+class Summary extends Model implements AuthenticatableContract, AuthorizableContract
 {
     use Authenticatable, Authorizable;
 
@@ -18,7 +18,7 @@ class Token extends Model implements AuthenticatableContract, AuthorizableContra
      * @var array
      */
     protected $fillable = [
-        'username', 'password',
+        'startdate', 'enddate',
     ];
 
     /**
@@ -26,5 +26,7 @@ class Token extends Model implements AuthenticatableContract, AuthorizableContra
      *
      * @var array
      */
-    ];
+//    protected $hidden = [
+//        'password',
+//    ];
 }
