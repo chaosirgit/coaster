@@ -18,7 +18,7 @@ class Drink extends Model implements AuthenticatableContract, AuthorizableContra
      * @var array
      */
     protected $fillable = [
-        'datetime', 'weight','startdate','enddate','type',
+        'datetime', 'weight','startDate','endDate','type',
     ];
 
     /**

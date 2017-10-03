@@ -18,7 +18,7 @@ class Suggest extends Model implements AuthenticatableContract, AuthorizableCont
      * @var array
      */
     protected $fillable = [
-        'datetime', 'weight',
+        'datetime', 'weight','startDate','endDate',
     ];
 
     /**

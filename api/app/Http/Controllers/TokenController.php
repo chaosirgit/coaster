@@ -14,7 +14,8 @@ class TokenController extends Controller
     public  $password;
 
     public function __construct(Request $request){
-      $this->username = $request->input('username');
+	    
+      $this->username = $request->input('userName');
       $this->password = $request->input('password');
     }
     public function get_token(Request $request)
@@ -37,9 +38,9 @@ class TokenController extends Controller
 	  return response()->json(['access_token'=>$ishave[0]->user_token,
 				   'token_type'=>'bearer',
 				   'expires_in'=>'1209599',
-				   'uid'=>$ishave[0]->uid],200);
-				  //'.issued'=>gmdate(DATE_RFC822,$issued_time),
-				  // '.expires'=>gmdate(DATE_RFC822,$expire_time)],200);
+				   'uid'=>strval($ishave[0]->uid),
+				  'issued'=>gmdate(DATE_RFC822,$ishave[0]->issued_time+28800),
+				   'expires'=>gmdate(DATE_RFC822,$ishave[0]->expire_time+28800)],200);
 	}
 	//否则
 	else{
@@ -56,9 +57,9 @@ class TokenController extends Controller
 	  return response()->json(['access_token'=>$return_json[0]->user_token,
 				   'token_type'=>'bearer',
 				   'expires_in'=>'1209599',
-				   'uid'=>$return_json[0]->uid,
-				   '.issued'=>gmdate(DATE_RFC822,$issued_time),
-				   '.expires'=>gmdate(DATE_RFC822,$expire_time)],200);
+				   'uid'=>strval($return_json[0]->uid),
+				   'issued'=>gmdate(DATE_RFC822,$issued_time),
+				   'expires'=>gmdate(DATE_RFC822,$expire_time)],200);
 
 	}
 	//如果密码不一致

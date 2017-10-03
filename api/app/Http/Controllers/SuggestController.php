@@ -13,16 +13,16 @@ class SuggestController extends Controller
 	public $datetime;
 	public $weight;
 	public $istoken;
-//	public $startdate;
-//	public $enddate;
+	public $startDate;
+	public $endDate;
 //	public $type;
 
 	public function __construct(Request $request){
 		$this->token = $request->header('Authorization');
 		$this->datetime = $request->input('datetime');
 		$this->istoken = DB::select('select * from token where user_token=:token',['token'=>substr($this->token,7)]);
-//		$this->startdate = $request->input('startdate');
-//		$this->enddate = $request->input('enddate');
+		$this->startDate = $request->input('startDate');
+		$this->enddate = $request->input('endDate');
 //		$this->type = $request->input('type');
 		$this->weight = $request->input('weight');
 	}
@@ -50,11 +50,11 @@ class SuggestController extends Controller
 
 	public function get_suggest(){
 		if($this->istoken){
-			if(!isset($this->datetime)){
-				return response('参数未指定或错误',400)->header('Content-Type','text/html;charset=utf-8');
+			if(!isset($this->startDate) && !isset($this->endDate)){
+				return response('',400)->header('Content-Type','text/html;charset=utf-8');
 			}
-		$result  = DB::select('select * from water where `suggest_date` = :suggestdate and `uid` = :uid',['uid'=>$this->istoken[0]->uid,'suggestdate'=>$this->datetime]);
-		if(!$result){return response('无数据',404)->header('Content-Type','text/html;charset=utf-8');}	
+		$result  = DB::select('select * from water where `suggest_date`>:startdate and `suggest_date`<:enddate and `uid` = :uid',['uid'=>$this->istoken[0]->uid,'startdate'=>$this->startDate,'enddate'=>$this->enddate]);
+		if(!$result){return response('',404)->header('Content-Type','text/html;charset=utf-8');}	
 			//	if($this->type == 0){
 			//	for($i=0;$i<count($result);$i++){
 			//		$arr[$i]['datetime'] = date('Y-m-d',strtotime($result[$i]->drink_date));
