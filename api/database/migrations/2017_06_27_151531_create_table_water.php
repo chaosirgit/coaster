@@ -15,7 +15,7 @@ class CreateTableWater extends Migration
     {
         Schema::create('water', function (Blueprint $table) {
 		$table->increments('id');
-		$table->integer('uid');
+		$table->string('uid');
 		$table->timestamp('creat_at');
 		$table->datetime('drink_date')->nullable();
 		$table->integer('drink_water')->nullable();

@@ -21,7 +21,6 @@ class UserController extends Controller
 	$weight= $request->input('weight') ?? null;
 	$email= $request->input('email') ?? null;
 
-	
 	//如果验证码正确	
 	if($code == '888888'){
 		if(!preg_match('/^\d{11}$/',$phone)){
@@ -54,7 +53,15 @@ class UserController extends Controller
 		}else{
 			if($gender == 'true'){$gender = 1;}
 			if($gender == 'false'){$gender = 0;}
-		DB::insert('insert into user (created_at,phone,password,gender,nickname,birthday,height,weight,email) values (:created_at,:phone,:password,:gender,:nickname,:birthday,:height,:weight,:email)',['created_at'=>date('Y-m-d H:i:s'),'phone'=>$phone,'password'=>Crypt::encrypt($password),'gender'=>$gender,'nickname'=>$nickname,'birthday'=>$birthday,'height'=>$height,'weight'=>$weight,'email'=>$email]);
+			//生成UUID
+                $str = md5(uniqid(time(), true));
+                $uuid  = substr($str,0,8) . '-';
+                $uuid .= substr($str,8,4) . '-';
+                $uuid .= substr($str,12,4) . '-';
+                $uuid .= substr($str,16,4) . '-';
+                $uuid .= substr($str,20,12);
+
+		DB::insert('insert into user (id,created_at,phone,password,gender,nickname,birthday,height,weight,email) values (:id,:created_at,:phone,:password,:gender,:nickname,:birthday,:height,:weight,:email)',['id'=>$uuid,'created_at'=>date('Y-m-d H:i:s'),'phone'=>$phone,'password'=>Crypt::encrypt($password),'gender'=>$gender,'nickname'=>$nickname,'birthday'=>$birthday,'height'=>$height,'weight'=>$weight,'email'=>$email]);
 		return response('',200)->header('Content-Type','text/html;charset=utf-8');
 	//    	return 'oK';	
 		}

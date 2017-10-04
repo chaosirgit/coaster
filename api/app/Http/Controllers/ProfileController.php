@@ -54,7 +54,7 @@ class ProfileController extends Controller
 				//准备返回的数据
 				$info =	DB::select('select * from user where id=:id',['id'=>$update_values['id']]);
 				//构建返回项
-				$return_values['uid']=$info[0]->id;	
+				$return_values['uid']=$info[0]->id;
 				$return_values['email']=$info[0]->email;
 				$return_values['nickname']=$info[0]->nickname;
 				$return_values['gender']=$info[0]->gender;
@@ -103,7 +103,7 @@ class ProfileController extends Controller
 				return response('用户不存在',404)->header('Content-Type','text/html;charset=utf-8');
 			}	
 			//构建返回项
-				$return_values['uid']=$info[0]->id;	
+				$return_values['uid']=strval($info[0]->id);
 				$return_values['email']=$info[0]->email;
 				$return_values['nickname']=$info[0]->nickname;
 				$return_values['gender']=$info[0]->gender;

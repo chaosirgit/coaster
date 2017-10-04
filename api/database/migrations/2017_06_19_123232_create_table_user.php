@@ -14,7 +14,7 @@ class CreateTableUser extends Migration
     public function up()
     {
         Schema::create('user', function (Blueprint $table) {
-            $table->increments('id');
+            $table->string('id');
 	    $table->timestamps();	//该方法会自动在表里建立 created_at 与 updated_at;
 	    $table->string('phone');
 	    $table->string('password');
@@ -24,6 +24,8 @@ class CreateTableUser extends Migration
 	    $table->integer('height')->nullable();
 	    $table->integer('weight')->nullable();
 	    $table->string('email')->nullable();
+	    $table->string('deviceid')->nullable();
+	    $table->longText('image')->nullable();
         });
     	
     }

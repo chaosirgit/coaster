@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
 use Illuminate\Support\Facades\DB;
+use JPush\Client as JPush;
 
 
 class RelationshipController extends Controller
@@ -16,15 +17,17 @@ class RelationshipController extends Controller
 	public $fromUsername;
 	public $fromUid;
 	public $expand;
+	public $app_key       = '7fa7f247619f0156b1761172';
+	public $master_secret = 'ec2bf690679f2118837db197';
 
 	public function __construct(Request $request){
 		$this->token = $request->header('Authorization');
 		$this->istoken = DB::select('select * from token where user_token=:token',['token'=>substr($this->token,7)]);
-		$this->toUsername = $request->input('toUsername');
-		$this->toUid = $request->input('toUid');
-		$this->fromUsername = $request->input('fromUsername');
-		$this->fromUid = $request->input('fromUid');
-		$this->expand = $request->input('expand');
+		$this->toUsername = $request->input('toUserName') ?? null;
+		$this->toUid = $request->input('toUid') ?? null;
+		$this->fromUsername = $request->input('fromUsername') ?? null;
+		$this->fromUid = $request->input('fromUid') ?? null;
+		$this->expand = $request->input('expand') ?? null;
 	}
 
 	//发起关系绑定
@@ -62,6 +65,23 @@ class RelationshipController extends Controller
 				
 				$row = 	DB::insert('insert into relationship (to_uid,status,to_username,start_time,from_uid,from_username) values (:touid,:status,:tousername,:starttime,:fromuid,:fromusername)',$insert);	
 				if($row){
+                    //推送
+                    $push_content = array(
+                        'fromUid'=>$selfinfo[0]->id,
+                        'toUid' => $info[0]->id,
+                        'dateTime' => date('Y-m-d H:i:s',time()+28800),
+                        'type' => '1'
+                    );
+                    $alias = str_replace('-','',$info[0]->id);
+                    $client = new JPush($this->app_key,$this->master_secret);
+                    $resp = $client->push()
+                        ->addAlias($alias)
+                        ->setPlatform('all')
+                        ->iosNotification($selfinfo[0]->nickname.'邀请您作为 TA 的伴侣',['sound'=>'sound','extras'=>$push_content])
+                        //->$push->iosNotification('hello', [
+                       //     'sound' => 'sound',
+                        ->message($selfinfo[0]->nickname.'邀请您作为 TA 的伴侣',['extras'=>$push_content]);
+                        $resp->send();
 					return response()->json(['fromUid'=>$selfinfo[0]->id,
 						'toUid'=>$info[0]->id,
 						'datetime'=>$insert['starttime'],
@@ -110,7 +130,8 @@ class RelationshipController extends Controller
 				}else{
 				return response('',500);
 				}
-			}else{return response('没有待绑定信息',404);}
+			}else{
+			    return response('没有待绑定信息',404);}
 		}else{
 			return response('',401);
 		}
@@ -144,6 +165,22 @@ class RelationshipController extends Controller
 			if($arr){
 				$row = 	DB::update('update relationship set status=2 where id=:id',['id'=>$arr[0]->id]);	
 				if($row){
+                    //推送
+                    $push_content = array(
+                        'fromUid'=>$arr[0]->from_uid,
+                        'toUid' => $arr[0]->to_uid,
+                        'dateTime' => date('Y-m-d H:i:s',time()+28800),
+                        'type' => '2'
+                    );
+                    $to_nickname = DB::select('select nickname from user where id=:id',['id'=>$arr[0]->to_uid]);
+                    $alias = str_replace('-','',$arr[0]->from_uid);
+                    $client = new JPush($this->app_key,$this->master_secret);
+                    $resp = $client->push()
+                        ->addAlias($alias)
+                        ->setPlatform('all')
+                        ->iosNotification($to_nickname[0]->nickname.'接受了您的邀请',['sound'=>'sound','extras'=>$push_content])
+                        ->message($to_nickname[0]->nickname.'接受了您的邀请',['extras'=>$push_content]);
+                    $resp->send();
 					return response()->json(['fromUid'=>$arr[0]->from_uid,
 								'toUid'=>$arr[0]->to_uid,
 								'dateTime'=>date('Y-m-d H:i:s',time()+28800),
@@ -186,6 +223,21 @@ class RelationshipController extends Controller
 			if($arr){
 				$row = 	DB::delete('delete from relationship where id=:id',['id'=>$arr[0]->id]);	
 				if($row){
+                    //推送
+                    $push_content = array(
+                        'fromUid'=>$arr[0]->from_uid,
+                        'toUid' => $arr[0]->to_uid,
+                        'dateTime' => date('Y-m-d H:i:s',time()+28800),
+                        'type' => '3'
+                    );
+                    $alias = str_replace('-','',$arr[0]->from_uid);
+                    $client = new JPush($this->app_key,$this->master_secret);
+                    $resp = $client->push()
+                        ->addAlias($alias)
+                        ->setPlatform('all')
+                        ->iosNotification($info[0]->nickname.'拒绝了您的邀请',['sound'=>'sound','extras'=>$push_content])
+                        ->message($info[0]->nickname.'拒绝了您的邀请',['extras'=>$push_content]);
+                    $resp->send();
 					return response()->json(['fromUid'=>$arr[0]->from_uid,
 								'toUid'=>$arr[0]->to_uid,
 								'dateTime'=>date('Y-m-d H:i:s',time()+28800),
@@ -203,18 +255,20 @@ class RelationshipController extends Controller
 	//获取关系
 	public function get_relation(){
 		if($this->istoken){
-		$arr =	DB::select('select * from relationship where from_uid=:uid or to_uid=:ruid',['uid'=>$this->istoken[0]->uid,'ruid'=>$this->istoken[0]->uid]);	
+		$arr =	DB::select('select * from relationship where from_uid=:uid or to_uid=:ruid',['uid'=>$this->istoken[0]->uid,'ruid'=>$this->istoken[0]->uid]);
 		if(!$arr){
 			return response('该用户没有任何绑定信息',404);
 			die;
 		}else{
 			if($this->expand == true){
+			    $fromNickname = DB::select('select nickname from user where id = :fromid',['fromid'=>$arr[0]->from_uid]);
+			    $toNickname = DB::select('select nickname from user where id = :toid',['toid'=>$arr[0]->to_uid]);
 				return response()->json(['status'=>$arr[0]->status,
 							'fromUid'=>$arr[0]->from_uid,
 							'toUid'=>$arr[0]->to_uid,
 							'startTime'=>$arr[0]->start_time,
-							'fromUsername'=>$arr[0]->from_username,
-							'toUsername'=>$arr[0]->to_username],200);
+							'fromNickname'=>$fromNickname[0]->nickname,
+							'toNickname'=>$toNickname[0]->nickname],200);
 			}
 				return response()->json(['status'=>$arr[0]->status,
 							'fromUid'=>$arr[0]->from_uid,
@@ -231,18 +285,44 @@ class RelationshipController extends Controller
 	//解除关系
 	public function del_relation(){
 	if($this->istoken){
-	$arr =	DB::select('select * from relationship where from_uid=:uid or to_uid=:ruid',['uid'=>$this->istoken[0]->uid,'ruid'=>$this->istoken[0]->uid]);	
+	$arr =	DB::select('select * from relationship where from_uid=:uid or to_uid=:ruid',['uid'=>$this->istoken[0]->uid,'ruid'=>$this->istoken[0]->uid]);
 		if(!$arr){
 			return response('该用户没有任何绑定信息',404);
 			die;
 		}else{
-			$row = DB::delete('delete from relationship where id=:id',['id'=>$arr[0]->id]);
+            $from_uid = $this->istoken[0]->uid;
+            if($from_uid == $arr[0]->from_uid)
+            {
+                $to_uid = $arr[0]->to_uid;
+            }else{
+                $to_uid = $arr[0]->from_uid;
+            }
+            $fromNickname = DB::select('select nickname from user where id = :fromid',['fromid'=>$from_uid]);
+//            $toNickname = DB::select('select nickname from user where id = :toid',['toid'=>$to_uid]);
+
+            $row = DB::delete('delete from relationship where id=:id',['id'=>$arr[0]->id]);
 
 			if($row){
+                //推送
+                $push_content = array(
+                    'fromUid'=>$from_uid,
+                    'toUid' => $to_uid,
+                    'dateTime' => date('Y-m-d H:i:s',time()+28800),
+                    'type' => '4'
+                );
+                $alias = str_replace('-','',$to_uid);
+                $client = new JPush($this->app_key,$this->master_secret);
+                $resp = $client->push()
+                    ->addAlias($alias)
+                    ->setPlatform('all')
+                    ->iosNotification($fromNickname[0]->nickname.'解除了与您的伴侣绑定',['sound'=>'sound','extras'=>$push_content])
+                    ->message($fromNickname[0]->nickname.'解除了与您的伴侣绑定',['extras'=>$push_content]);
+                    $resp->send();
 				return response()->json(['Type'=>4,
-							'fromUid'=>$arr[0]->from_uid,
-							'toUid'=>$arr[0]->to_uid,
+							'fromUid'=>$from_uid,
+							'toUid'=>$to_uid,
 							'startTime'=>$arr[0]->start_time],200);
+
 			}else{return response('',500);}
 		}
 

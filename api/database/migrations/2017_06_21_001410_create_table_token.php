@@ -15,7 +15,7 @@ class CreateTableToken extends Migration
     {
         Schema::create('token', function (Blueprint $table) {
             $table->increments('id');
-	    $table->integer('uid');
+	    $table->string('uid');
 	    $table->string('user_token');
 	    $table->timestamp('issued_time');
 	    $table->timestamp('expire_time');
