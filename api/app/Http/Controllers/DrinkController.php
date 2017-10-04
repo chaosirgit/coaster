@@ -21,8 +21,8 @@ class DrinkController extends Controller
 		$this->token = $request->header('Authorization');
 		$this->datetime = $request->input('datetime');
 		$this->istoken = DB::select('select * from token where user_token=:token',['token'=>substr($this->token,7)]);
-		$this->startdate = $request->input('startDate');
-		$this->enddate = $request->input('endDate');
+		$this->startdate = $request->input('startDate').' 00:00:00';
+		$this->enddate = $request->input('endDate').' 23:59:59';
 		$this->type = $request->input('type');
 		$this->weight = $request->input('weight');
 	}
@@ -53,21 +53,22 @@ class DrinkController extends Controller
 			if(!isset($this->startdate) || !isset($this->enddate) || $this->startdate>$this->enddate){
 				return response('',400)->header('Content-Type','text/html;charset=utf-8');
 			}
-		$result  = DB::select('select * from water where (`drink_date` > :startdate and `drink_date` < :enddate) and `uid`=:uid;',['uid'=>$this->istoken[0]->uid,'startdate'=>$this->startdate,'enddate'=>$this->enddate]);
+		$result  = DB::select('select * from water where (`drink_date` >= :startdate and `drink_date` <= :enddate) and `uid`=:uid;',['uid'=>$this->istoken[0]->uid,'startdate'=>$this->startdate,'enddate'=>$this->enddate]);
 		if($result){
 			if($this->type == 0){
 				for($i=0;$i<count($result);$i++){
 					$arr[$i]['datetime'] = date('Y-m-d',strtotime($result[$i]->drink_date));
 					$arr[$i]['weight'] = $result[$i]->drink_water;
 				}
-		//	var_dump($arr);
-				return response()->json($arr,200);	
+				$aResult = array('Drinks'=>$arr);
+				return response()->json($aResult,200);
 			}else{
 				for($i=0;$i<count($result);$i++){
 					$arr[$i]['datetime'] = $result[$i]->drink_date;
 					$arr[$i]['weight'] = $result[$i]->drink_water;
 				}
-				return response()->json($arr,200);
+				$aResult = array('Drinks'=>$arr);
+				return response()->json($aResult,200);
 			}
 		}
 		else{return response()->json(null,200);}		
