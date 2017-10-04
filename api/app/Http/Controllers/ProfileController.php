@@ -119,4 +119,5 @@ class ProfileController extends Controller
 		return response('',401)->header('Content-Type','text/html;charset=utf-8');
 		}
 	}
+
 }

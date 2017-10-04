@@ -71,5 +71,34 @@ class UserController extends Controller
 		return response('',400)->header('Content-Type','text/html;charset=utf-8');
 	}
 	}
+
+	//重设密码
+	public function setpassword(Request $request)
+    {
+        $phone = $request->input('phone');
+        $code = $request->input('code');
+        $newpassword = $request->input('newpassword');
+
+
+        if ($code == '888888') {
+            if (!preg_match('/^[0-9a-zA-Z\S]{6,16}$/', $password)) {
+                //return 'password is 6-16 <br>';}
+                return response('', 400)->header('Content-Type', 'text/html;charset=utf-8');
+                die;
+            }
+            $row = DB::select('select count(*) from user where phone = :phone', ['phone' => $phone]);
+            if (!$row) {
+                return response('用户不存在', 404)->header('Content-Type', 'text/html;charset=utf-8');
+                die;
+            }
+           $is = DB::update('update user set password = :newpassword where phone = :phone', ['newpassword' =>Crypt::encrypt($newpassword),'phone'=>$phone]);
+            if($is)
+			{
+				return response('',200)->header('Content-Type','text/html;charset=utf-8');
+			}
+        }else{
+            return response('验证码错误',400)->header('Content-Type','text/html;charset=utf-8');
+        }
+    }
 }
 ?>

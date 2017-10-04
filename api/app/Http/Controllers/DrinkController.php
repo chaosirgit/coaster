@@ -48,12 +48,12 @@ class DrinkController extends Controller
 	}
 
 
-	public function get_drink(){
+	public function get_drink($uuid = $this->istoken[0]->uid){
 		if($this->istoken){
 			if(!isset($this->startdate) || !isset($this->enddate) || $this->startdate>$this->enddate){
 				return response('',400)->header('Content-Type','text/html;charset=utf-8');
 			}
-		$result  = DB::select('select * from water where (`drink_date` >= :startdate and `drink_date` <= :enddate) and `uid`=:uid;',['uid'=>$this->istoken[0]->uid,'startdate'=>$this->startdate,'enddate'=>$this->enddate]);
+		$result  = DB::select('select * from water where (`drink_date` >= :startdate and `drink_date` <= :enddate) and `uid`=:uid;',['uid'=>$uuid,'startdate'=>$this->startdate,'enddate'=>$this->enddate]);
 		if($result){
 			if($this->type == 0){
 				for($i=0;$i<count($result);$i++){
@@ -77,6 +77,21 @@ class DrinkController extends Controller
 		return response('',401)->header('Content-Type','text/html;charset=utf-8');
 		}
 	}
+
+	public function get_pair(){
+        $result = DB::select('select * from relationship where from_uid=:fromid or to_uid=:toid',['fromid'=>$this->istoken[0]->uid,'toid'=>$this->istoken[0]->uid]);
+        if(!$result)
+        {
+            return response('',404)->header('Content-Type','text/html;charset=utf-8');
+        }
+        if($result[0]->to_uid == $this->istoken[0]->uid)
+        {
+            $pairid = $result[0]->from_uid;
+        }else{
+            $pairid = $result[0]->to_uid;
+        }
+       return $this->get_drink($pairid);
+    }
 
 	public function post_health(){
 		if($this->istoken){

@@ -12,6 +12,7 @@
 
 $app->post('api/account/register','UserController@register');//注册用户
 $app->post('/token','TokenController@get_token');//登陆
+$app->post('api/account/setpassword','UserController@setpassword');//重设密码
 $app->put('api/account/profile','ProfileController@update');//更改用户资料
 $app->get('api/account/profile','ProfileController@getinfo');//获取用户资料
 $app->post('api/avatar','AvatarController@post_image');//上传用户头像
@@ -20,8 +21,10 @@ $app->post('api/device','DeviceController@post_device');//绑定设备
 $app->delete('api/device','DeviceController@delete_device');//解绑设备
 $app->post('api/drink','DrinkController@post_drink');//添加饮水记录
 $app->get('api/drink','DrinkController@get_drink');//查看当前用户饮水记录
+$app->get('api/drink/pair','DrinkController@get_pair');//获取伴侣饮水记录
 $app->post('api/drink/suggest','SuggestController@post_suggest');//上传用户建议饮水量
 $app->get('api/drink/suggest','SuggestController@get_suggest');//获取用户建议饮水量
+$app->get('api/drink/pair/suggest','SuggestController@getpair_suggest');//获取伴侣建议饮水量
 $app->post('api/drinkhealths','DrinkController@post_health');//提交用户饮水健康
 $app->get('api/drinkhealths/summary','SummaryController@issummary');//查看用户饮水健康统计
 $app->post('api/relationship/sendrequest','RelationshipController@send_request');//发起关系绑定请求

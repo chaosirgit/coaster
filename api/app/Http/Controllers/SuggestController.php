@@ -21,8 +21,8 @@ class SuggestController extends Controller
 		$this->token = $request->header('Authorization');
 		$this->datetime = $request->input('datetime');
 		$this->istoken = DB::select('select * from token where user_token=:token',['token'=>substr($this->token,7)]);
-		$this->startDate = $request->input('startDate');
-		$this->enddate = $request->input('endDate');
+		$this->startDate = $request->input('startDate').' 00:00:00';
+		$this->enddate = $request->input('endDate').' 23:59:59';
 //		$this->type = $request->input('type');
 		$this->weight = $request->input('weight');
 	}
@@ -48,12 +48,12 @@ class SuggestController extends Controller
 	}
 
 
-	public function get_suggest(){
+	public function get_suggest($uuid = $this->istoken[0]->uid){
 		if($this->istoken){
 			if(!isset($this->startDate) && !isset($this->endDate)){
 				return response('',400)->header('Content-Type','text/html;charset=utf-8');
 			}
-		$result  = DB::select('select * from water where `suggest_date`>:startdate and `suggest_date`<:enddate and `uid` = :uid',['uid'=>$this->istoken[0]->uid,'startdate'=>$this->startDate,'enddate'=>$this->enddate]);
+		$result  = DB::select('select * from water where `suggest_date`>=:startdate and `suggest_date`<=:enddate and `uid` = :uid',['uid'=>$uuid,'startdate'=>$this->startDate,'enddate'=>$this->enddate]);
 		if(!$result){return response('',404)->header('Content-Type','text/html;charset=utf-8');}	
 			//	if($this->type == 0){
 			//	for($i=0;$i<count($result);$i++){
@@ -74,4 +74,19 @@ class SuggestController extends Controller
 		return response('',401)->header('Content-Type','text/html;charset=utf-8');
 		}
 	}
+
+    public function getpair_suggest(){
+        $result = DB::select('select * from relationship where from_uid=:fromid or to_uid=:toid',['fromid'=>$this->istoken[0]->uid,'toid'=>$this->istoken[0]->uid]);
+        if(!$result)
+        {
+            return response('',404)->header('Content-Type','text/html;charset=utf-8');
+        }
+        if($result[0]->to_uid == $this->istoken[0]->uid)
+        {
+            $pairid = $result[0]->from_uid;
+        }else{
+            $pairid = $result[0]->to_uid;
+        }
+        return $this->get_suggest($pairid);
+    }
 }
