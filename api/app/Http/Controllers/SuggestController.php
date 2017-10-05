@@ -48,7 +48,7 @@ class SuggestController extends Controller
 	}
 
 
-	public function get_suggest($uuid = $this->istoken[0]->uid){
+	public function get_suglog($uuid){
 		if($this->istoken){
 			if(!isset($this->startDate) && !isset($this->endDate)){
 				return response('',400)->header('Content-Type','text/html;charset=utf-8');
@@ -75,6 +75,11 @@ class SuggestController extends Controller
 		}
 	}
 
+	public function get_suggest(){
+	    $uuid = $this->istoken[0]->uid;
+	    return $this->get_suglog($uuid);
+    }
+
     public function getpair_suggest(){
         $result = DB::select('select * from relationship where from_uid=:fromid or to_uid=:toid',['fromid'=>$this->istoken[0]->uid,'toid'=>$this->istoken[0]->uid]);
         if(!$result)
@@ -87,6 +92,6 @@ class SuggestController extends Controller
         }else{
             $pairid = $result[0]->to_uid;
         }
-        return $this->get_suggest($pairid);
+        return $this->get_suglog($pairid);
     }
 }
