@@ -15,7 +15,7 @@ class TokenController extends Controller
 
     public function __construct(Request $request){
 	    
-      $this->username = $request->input('userName');
+      $this->username = $request->input('username');
       $this->password = $request->input('password');
     }
     public function get_token(Request $request)

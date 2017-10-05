@@ -21,9 +21,13 @@ class UserController extends Controller
 	$weight= $request->input('weight') ?? null;
 	$email= $request->input('email') ?? null;
 	$iscode = DB::select('select * from session where phone=:phone',['phone'=>$phone]);
+        if(!$iscode){
+            return response('验证码错误',400)->header('Content-Type','text/html;charset=utf-8');
+        }
 //	dd($iscode);
 	//如果验证码正确	
-	if($code == '888888'){
+	if($code == $iscode[0]->code){
+		DB::delete('delete from session where code=:code',['code'=>$iscode[0]->code]);
 		if(!preg_match('/^\d{11}$/',$phone)){
 		//return 'phone flase <br>';}
 		return response('',400)->header('Content-Type','text/html;charset=utf-8');}
@@ -80,14 +84,17 @@ class UserController extends Controller
         $code = $request->input('code');
         $newpassword = $request->input('newpassword');
         $iscode = DB::select('select * from session where phone=:phone',['phone'=>$phone]);
-
-        if ($code == '888888') {
-            if (!preg_match('/^[0-9a-zA-Z\S]{6,16}$/', $password)) {
+		if(!$iscode){
+			return response('验证码错误',400)->header('Content-Type','text/html;charset=utf-8');
+        }
+        if ($code == $iscode[0]->code) {
+            DB::delete('delete from session where code=:code',['code'=>$iscode[0]->code]);
+            if (!preg_match('/^[0-9a-zA-Z\S]{6,16}$/', $newpassword)) {
                 //return 'password is 6-16 <br>';}
                 return response('', 400)->header('Content-Type', 'text/html;charset=utf-8');
                 die;
             }
-            $row = DB::select('select count(*) from user where phone = :phone', ['phone' => $phone]);
+            $row = DB::select('select * from user where phone = :phone', ['phone' => $phone]);
             if (!$row) {
                 return response('用户不存在', 404)->header('Content-Type', 'text/html;charset=utf-8');
                 die;

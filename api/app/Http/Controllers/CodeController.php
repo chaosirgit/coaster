@@ -73,10 +73,11 @@ class CodeController extends Controller
         $type = $request->input('type') ?? null;
         $return_str = $this->send($phone);
         $oReturn = json_decode($return_str);
+//        dd($oReturn);
         if($oReturn->code == 2){
-            return response()->json('',200);
+            return response()->json(null,200);
         }else{
-            return response()->json('',400);
+            return response()->json(null,400);
         }
     }
 }
