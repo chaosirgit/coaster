@@ -34,3 +34,5 @@ $app->post('api/relationship/acceptrequest','RelationshipController@accept_reque
 $app->get('api/relationship','RelationshipController@get_relation');//获取当前用户关系状态
 $app->delete('api/relationship','RelationshipController@del_relation');//解除当前用户关系状态
 $app->post('api/account/sendcode','CodeController@code');//发送验证码
+$app->post('api/relationship/notification','RelationshipController@notification');//推送文本至伴侣
+$app->post('api/feedback','RelationshipController@feedback');//提交反馈

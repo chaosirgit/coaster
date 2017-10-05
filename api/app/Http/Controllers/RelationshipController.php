@@ -330,5 +330,54 @@ class RelationshipController extends Controller
 	return response('',401);
 	}	
 	}
+
+	public function notification(Request $request){
+	    $content = $request->input('notification') ?? return response(null,400);
+        if($this->istoken){
+            $arr =	DB::select('select * from relationship where from_uid=:uid or to_uid=:ruid',['uid'=>$this->istoken[0]->uid,'ruid'=>$this->istoken[0]->uid]);
+            if(!$arr){
+                return response('该用户没有任何绑定信息',400);
+                die;
+            }else{
+                $from_uid = $this->istoken[0]->uid;
+                if($from_uid == $arr[0]->from_uid)
+                {
+                    $to_uid = $arr[0]->to_uid;
+                }else{
+                    $to_uid = $arr[0]->from_uid;
+                }
+                $row = DB::insert('insert into text (from_uid, to_uid, content, created_at) values (:from_uid,:to_uid,:content,:create_at)',['from_uid'=>$from_uid,'to_uid'=>$to_uid,'content'=>$content,'create_at'=>time()+28800]);
+                if($row){
+                    //推送
+                    $push_content = array(
+                        'fromUid'=>$from_uid,
+                        'toUid' => $to_uid,
+                        'dateTime' => date('Y-m-d H:i:s',time()+28800),
+                        'type' => '5'
+                    );
+                    $alias = str_replace('-','',$to_uid);
+                    $client = new JPush($this->app_key,$this->master_secret);
+                    $resp = $client->push()
+                        ->addAlias($alias)
+                        ->setPlatform('all')
+                        ->iosNotification($content,['sound'=>'sound','extras'=>$push_content])
+                        ->message($content,['extras'=>$push_content]);
+                    $resp->send();
+                    return response()->json(null,200);
+                }else{return response(null,500);}
+            }
+        }else{return response(null,401);
+        }
+    }
+
+    public function feedback(Request $request){
+	    $content = $request->input('content') ?? return response(null,400);
+        if($this->istoken){
+            $row = DB::insert('insert into text (from_uid, to_uid, content, created_at) values (:from_uid,:to_uid,:content,:create_at)',['from_uid'=>$this->istoken[0]->uid,'to_uid'=>'0','content'=>$content,'create_at'=>time()+28800]);
+            if($row){
+                return response(null,200);
+            }else{return response(null,500);}
+        }else{return response(null,401);}
+    }
 }
 	 
