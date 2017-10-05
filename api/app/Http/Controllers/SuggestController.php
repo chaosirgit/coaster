@@ -54,7 +54,7 @@ class SuggestController extends Controller
 				return response('',400)->header('Content-Type','text/html;charset=utf-8');
 			}
 		$result  = DB::select('select * from water where `suggest_date`>=:startdate and `suggest_date`<=:enddate and `uid` = :uid',['uid'=>$uuid,'startdate'=>$this->startDate,'enddate'=>$this->enddate]);
-		if(!$result){return response('',404)->header('Content-Type','text/html;charset=utf-8');}	
+		if(!$result){return response()->json(array('Drinks'=> array()),200);}
 			//	if($this->type == 0){
 			//	for($i=0;$i<count($result);$i++){
 			//		$arr[$i]['datetime'] = date('Y-m-d',strtotime($result[$i]->drink_date));
@@ -67,7 +67,8 @@ class SuggestController extends Controller
 					$arr[$i]['datetime'] = $result[$i]->suggest_date;
 					$arr[$i]['weight'] = $result[$i]->suggest_water;
 				}
-				return response()->json($arr,200);
+				$aResult = array('Drinks'=>$arr);
+				return response()->json($aResult,200);
 					
 	
 		}else{

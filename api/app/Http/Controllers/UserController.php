@@ -20,7 +20,8 @@ class UserController extends Controller
 	$height= $request->input('height') ?? null;
 	$weight= $request->input('weight') ?? null;
 	$email= $request->input('email') ?? null;
-
+	$iscode = DB::select('select * from session where phone=:phone',['phone'=>$phone]);
+//	dd($iscode);
 	//如果验证码正确	
 	if($code == '888888'){
 		if(!preg_match('/^\d{11}$/',$phone)){
@@ -78,7 +79,7 @@ class UserController extends Controller
         $phone = $request->input('phone');
         $code = $request->input('code');
         $newpassword = $request->input('newpassword');
-
+        $iscode = DB::select('select * from session where phone=:phone',['phone'=>$phone]);
 
         if ($code == '888888') {
             if (!preg_match('/^[0-9a-zA-Z\S]{6,16}$/', $password)) {

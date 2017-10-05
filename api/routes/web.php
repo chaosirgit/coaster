@@ -33,3 +33,4 @@ $app->post('api/relationship/denyrequest','RelationshipController@deny_request')
 $app->post('api/relationship/acceptrequest','RelationshipController@accept_request');//接受关系绑定请求
 $app->get('api/relationship','RelationshipController@get_relation');//获取当前用户关系状态
 $app->delete('api/relationship','RelationshipController@del_relation');//解除当前用户关系状态
+$app->post('api/account/sendcode','CodeController@code');//发送验证码

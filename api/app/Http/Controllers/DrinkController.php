@@ -63,14 +63,22 @@ class DrinkController extends Controller
 				}
 				$aResult = array('Drinks'=>$arr);
 				return response()->json($aResult,200);
-			}else{
+			}elseif($this->type == 1){
 				for($i=0;$i<count($result);$i++){
 					$arr[$i]['datetime'] = $result[$i]->drink_date;
 					$arr[$i]['weight'] = $result[$i]->drink_water;
 				}
 				$aResult = array('Drinks'=>$arr);
 				return response()->json($aResult,200);
-			}
+			}elseif($this->type == 2){
+            $results = DB::select('select uid,year(drink_date) as year,month(drink_date) as month,day(drink_date) as day,sum(drink_water) as drinkwater from water where (`drink_date` >= :startdate and `drink_date` <= :enddate) and `uid`=:uid GROUP BY day,month,year',['uid'=>$uuid,'startdate'=>$this->startdate,'enddate'=>$this->enddate]);
+            for($i=0;$i<count($results);$i++){
+                $arr[$i]['datetime'] = date('Y-m-d H:i:s',strtotime($results[$i]->year.'-'.$results[$i]->month.'-'.$results[$i]->day.' 00:00:00'));
+                $arr[$i]['weight'] = intval($results[$i]->drinkwater);
+            }
+            $aResult = array('Drinks'=>$arr);
+                return response()->json($aResult,200);
+            }
 		}
 		else{return response()->json(null,200);}		
 	//var_dump($result);
