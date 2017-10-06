@@ -373,7 +373,7 @@ class RelationshipController extends Controller
     public function feedback(Request $request){
 	    $content = $request->input('content') ?? response(null,400);
         if($this->istoken){
-            $row = DB::insert('insert into text (from_uid, to_uid, content, created_at) values (:from_uid,:to_uid,:content,:create_at)',['from_uid'=>$this->istoken[0]->uid,'to_uid'=>'0','content'=>$content,'create_at'=>time()+28800]);
+            $row = DB::insert('insert into text (from_uid, to_uid, content, created_at) values (:from_uid,:to_uid,:content,:create_at)',['from_uid'=>$this->istoken[0]->uid,'to_uid'=>'0','content'=>$content,'create_at'=>date('Y-m-d H:i:s',time()+28800]));
             if($row){
                 return response(null,200);
             }else{return response(null,500);}
