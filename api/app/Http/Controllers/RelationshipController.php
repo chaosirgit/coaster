@@ -346,7 +346,7 @@ class RelationshipController extends Controller
                 }else{
                     $to_uid = $arr[0]->from_uid;
                 }
-                $row = DB::insert('insert into text (from_uid, to_uid, content, created_at) values (:from_uid,:to_uid,:content,:create_at)',['from_uid'=>$from_uid,'to_uid'=>$to_uid,'content'=>$content,'create_at'=>time()+28800]);
+                $row = DB::insert('insert into text (from_uid, to_uid, content, created_at) values (:from_uid,:to_uid,:content,:create_at)',['from_uid'=>$from_uid,'to_uid'=>$to_uid,'content'=>$content,'create_at'=>date('Y-m-d H:i:s',time()+28800]));
                 if($row){
                     //推送
                     $push_content = array(
