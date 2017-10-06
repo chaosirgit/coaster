@@ -332,7 +332,7 @@ class RelationshipController extends Controller
 	}
 
 	public function notification(Request $request){
-	    $content = $request->input('notification') ?? return response(null,400);
+	    $content = $request->input('notification') ?? response(null,400);
         if($this->istoken){
             $arr =	DB::select('select * from relationship where from_uid=:uid or to_uid=:ruid',['uid'=>$this->istoken[0]->uid,'ruid'=>$this->istoken[0]->uid]);
             if(!$arr){
@@ -371,7 +371,7 @@ class RelationshipController extends Controller
     }
 
     public function feedback(Request $request){
-	    $content = $request->input('content') ?? return response(null,400);
+	    $content = $request->input('content') ?? response(null,400);
         if($this->istoken){
             $row = DB::insert('insert into text (from_uid, to_uid, content, created_at) values (:from_uid,:to_uid,:content,:create_at)',['from_uid'=>$this->istoken[0]->uid,'to_uid'=>'0','content'=>$content,'create_at'=>time()+28800]);
             if($row){
