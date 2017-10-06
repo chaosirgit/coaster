@@ -27,7 +27,7 @@
     <nav class="navbar navbar-inverse navbar-fixed-top navbar-static-top">
       <div class="container">
         <div class="navbar-header">
-          <a href="index.html" target="" class="navbar-brand logo">nevermore</a>
+          <a href="./" target="" class="navbar-brand logo">nevermore</a>
           <button type="button" data-toggle="collapse" class="navbar-toggle" data-target="#navbar-collapse">
             <span class="icon-bar"></span>
             <span class="icon-bar"></span>

@@ -10,8 +10,8 @@ use Illuminate\Support\Facades\DB;//引入数据库操作门面
 class CodeController extends Controller
 {
     public $url = 'http://106.ihuyi.com/webservice/sms.php?method=Submit';
-    public $apiid = 'C93100065';
-    public $apikey = 'a74575afed73a39cbd417b2754eac43d';
+    public $apiid = 'C42915324';
+    public $apikey = 'cb95ef440d63a1bdc47848312cac1cd1';
     public $mobile;
     public $content;
     public $format = 'json';
@@ -22,7 +22,7 @@ class CodeController extends Controller
 //        var_dump($iscode);
         $this->mobile = strval($mobile);
 //        var_dump($this->mobile);
-        $this->content = '您的验证码是：'.$iscode.'。请不要把验证码泄露给其他人。';
+        $this->content = '您的验证码是：'.$iscode;
         $postvalue = array(
             'account'=>$this->apiid,
             'password'=>$this->apikey,
