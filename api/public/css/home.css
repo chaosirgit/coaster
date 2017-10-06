@@ -1,0 +1,18 @@
+#mycarousel {
+  margin-top: 50px;
+}
+#mycarousel img {
+  margin:0 auto;
+}
+.table1 img,.table2 img {
+  display: block;
+  margin:0 auto;
+}
+.table1 {
+  padding-top: 20px;
+  padding-bottom: 20px;
+}
+.table2 {
+  padding-top: 20px;
+  padding-bottom: 20px;
+}
