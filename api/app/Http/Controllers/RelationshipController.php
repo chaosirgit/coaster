@@ -66,6 +66,7 @@ class RelationshipController extends Controller
 				$row = 	DB::insert('insert into relationship (to_uid,status,to_username,start_time,from_uid,from_username) values (:touid,:status,:tousername,:starttime,:fromuid,:fromusername)',$insert);	
 				if($row){
                     //推送
+                    
                     $push_content = array(
                         'fromUid'=>$selfinfo[0]->id,
                         'toUid' => $info[0]->id,
@@ -80,7 +81,8 @@ class RelationshipController extends Controller
                         ->iosNotification($selfinfo[0]->nickname.'邀请您作为 TA 的伴侣',['sound'=>'sound','extras'=>$push_content])
                         //->$push->iosNotification('hello', [
                        //     'sound' => 'sound',
-                        ->message($selfinfo[0]->nickname.'邀请您作为 TA 的伴侣',['extras'=>$push_content]);
+                        ->message($selfinfo[0]->nickname.'邀请您作为 TA 的伴侣',['extras'=>$push_content])
+                        ->options(array('apns_production'=>true));    
                         $resp->send();
 					return response()->json(['fromUid'=>$selfinfo[0]->id,
 						'toUid'=>$info[0]->id,
@@ -179,7 +181,8 @@ class RelationshipController extends Controller
                         ->addAlias($alias)
                         ->setPlatform('all')
                         ->iosNotification($to_nickname[0]->nickname.'接受了您的邀请',['sound'=>'sound','extras'=>$push_content])
-                        ->message($to_nickname[0]->nickname.'接受了您的邀请',['extras'=>$push_content]);
+                        ->message($to_nickname[0]->nickname.'接受了您的邀请',['extras'=>$push_content])
+                        ->options(array('apns_production'=>true));    
                     $resp->send();
 					return response()->json(['fromUid'=>$arr[0]->from_uid,
 								'toUid'=>$arr[0]->to_uid,
@@ -221,6 +224,7 @@ class RelationshipController extends Controller
 			if(!$info){return response('没有这个用户',500);die;}
 			if($info[0]->id == $selfinfo[0]->id){return response('不能拒绝自己',400);die;}
 			if($arr){
+                $to = DB::select('select * from user where id = :id',['id'=>$arr[0]->to_uid]);
 				$row = 	DB::delete('delete from relationship where id=:id',['id'=>$arr[0]->id]);	
 				if($row){
                     //推送
@@ -235,8 +239,9 @@ class RelationshipController extends Controller
                     $resp = $client->push()
                         ->addAlias($alias)
                         ->setPlatform('all')
-                        ->iosNotification($info[0]->nickname.'拒绝了您的邀请',['sound'=>'sound','extras'=>$push_content])
-                        ->message($info[0]->nickname.'拒绝了您的邀请',['extras'=>$push_content]);
+                        ->iosNotification($to[0]->nickname.'拒绝了您的邀请',['sound'=>'sound','extras'=>$push_content])
+                        ->message($to[0]->nickname.'拒绝了您的邀请',['extras'=>$push_content])
+                        ->options(array('apns_production'=>true));    
                     $resp->send();
 					return response()->json(['fromUid'=>$arr[0]->from_uid,
 								'toUid'=>$arr[0]->to_uid,
@@ -316,7 +321,8 @@ class RelationshipController extends Controller
                     ->addAlias($alias)
                     ->setPlatform('all')
                     ->iosNotification($fromNickname[0]->nickname.'解除了与您的伴侣绑定',['sound'=>'sound','extras'=>$push_content])
-                    ->message($fromNickname[0]->nickname.'解除了与您的伴侣绑定',['extras'=>$push_content]);
+                    ->message($fromNickname[0]->nickname.'解除了与您的伴侣绑定',['extras'=>$push_content])
+                        ->options(array('apns_production'=>true));    
                     $resp->send();
 				return response()->json(['Type'=>4,
 							'fromUid'=>$from_uid,
@@ -346,7 +352,7 @@ class RelationshipController extends Controller
                 }else{
                     $to_uid = $arr[0]->from_uid;
                 }
-                $row = DB::insert('insert into text (from_uid, to_uid, content, created_at) values (:from_uid,:to_uid,:content,:create_at)',['from_uid'=>$from_uid,'to_uid'=>$to_uid,'content'=>$content,'create_at'=>date('Y-m-d H:i:s',time()+28800]));
+                $row = DB::insert('insert into text (from_uid, to_uid, content, created_at) values (:from_uid,:to_uid,:content,:create_at)',['from_uid'=>$from_uid,'to_uid'=>$to_uid,'content'=>$content,'create_at'=>date('Y-m-d H:i:s',time()+28800)]);
                 if($row){
                     //推送
                     $push_content = array(
@@ -361,7 +367,8 @@ class RelationshipController extends Controller
                         ->addAlias($alias)
                         ->setPlatform('all')
                         ->iosNotification($content,['sound'=>'sound','extras'=>$push_content])
-                        ->message($content,['extras'=>$push_content]);
+                        ->message($content,['extras'=>$push_content])
+                        ->options(array('apns_production'=>true));    
                     $resp->send();
                     return response()->json(null,200);
                 }else{return response(null,500);}
@@ -373,7 +380,7 @@ class RelationshipController extends Controller
     public function feedback(Request $request){
 	    $content = $request->input('content') ?? response(null,400);
         if($this->istoken){
-            $row = DB::insert('insert into text (from_uid, to_uid, content, created_at) values (:from_uid,:to_uid,:content,:create_at)',['from_uid'=>$this->istoken[0]->uid,'to_uid'=>'0','content'=>$content,'create_at'=>date('Y-m-d H:i:s',time()+28800]));
+            $row = DB::insert('insert into text (from_uid, to_uid, content, created_at) values (:from_uid,:to_uid,:content,:create_at)',['from_uid'=>$this->istoken[0]->uid,'to_uid'=>'0','content'=>$content,'create_at'=>date('Y-m-d H:i:s',time()+28800)]);
             if($row){
                 return response(null,200);
             }else{return response(null,500);}
