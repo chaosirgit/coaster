@@ -36,4 +36,5 @@ $app->delete('api/relationship','RelationshipController@del_relation');//解除�
 $app->post('api/account/sendcode','CodeController@code');//发送验证码
 $app->post('api/relationship/notification','RelationshipController@notification');//推送文本至伴侣
 $app->post('api/feedback','RelationshipController@feedback');//提交反馈
+$app->get('api/version/bluetooth','VersionController@bluetooth');//获取蓝牙版本号
 $app->get('/',function(){return view('index');});//首页
